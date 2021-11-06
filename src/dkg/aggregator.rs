@@ -133,6 +133,19 @@ impl<
         let alpha = E::Fr::rand(rng);
         let domain = Radix2EvaluationDomain::<E::Fr>::new(self.participants.len())
             .ok_or(DKGError::<E>::EvaluationDomainError)?;
+        let powers_of_alpha = {
+            let mut current_alpha = E::Fr::one();
+            let mut powers = vec![];
+            for _ in 0..=self.participants.len() {
+                powers.push(current_alpha.into_repr());
+                current_alpha *= &alpha;
+            }
+            powers
+        };
+        let inv_powers_of_alpha = powers_of_alpha[0..=self.config.degree]
+            .iter()
+            .map(|power| E::Fr::from_repr(*power).unwrap().neg().into_repr())
+            .collect::<Vec<_>>();
         let lagrange_coefficients = domain
             .evaluate_all_lagrange_coefficients(alpha)
             .into_iter()
@@ -144,17 +157,8 @@ impl<
             let mut scalars = vec![];
             bases.extend_from_slice(&share.a_i);
             scalars.extend_from_slice(&lagrange_coefficients);
-            let powers_of_alpha = {
-                let mut current_alpha = E::Fr::one().neg();
-                let mut powers = vec![];
-                for _ in 0..=self.config.degree {
-                    powers.push(current_alpha.into_repr());
-                    current_alpha *= &alpha;
-                }
-                powers
-            };
             bases.extend_from_slice(&[vec![c_i], share.f_i.clone()].concat());
-            scalars.extend_from_slice(&powers_of_alpha);
+            scalars.extend_from_slice(&inv_powers_of_alpha);
             let product = VariableBaseMSM::multi_scalar_mul(&bases, &scalars);
             if !product.is_zero() {
                 return Err(DKGError::EvaluationsCheckError(product.into()));
@@ -170,15 +174,6 @@ impl<
             return Err(DKGError::RatioIncorrect);
         }
 
-        let powers_of_alpha = {
-            let mut current_alpha = E::Fr::one();
-            let mut powers = vec![];
-            for _ in 0..=self.participants.len() {
-                powers.push(current_alpha.into_repr());
-                current_alpha *= &alpha;
-            }
-            powers
-        };
         let (batched_a_i, batched_g_1_neg) = {
             let g_1_neg = self.config.srs.g_g1.neg();
             let batched_a_i = share
