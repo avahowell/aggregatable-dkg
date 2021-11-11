@@ -49,7 +49,7 @@ impl<E: PairingEngine> Signature<E> {
         message: &[u8],
     ) -> Result<(), SignatureError> {
         let hashed_message = hash_to_group::<E::G1Affine>(PERSONALIZATION, message)?;
-        self.verify_proof(public_key.clone(), hashed_message)
+        self.verify_proof(public_key, hashed_message)
     }
 
     pub fn derive(
@@ -162,11 +162,11 @@ impl<E: PairingEngine> Signature<E> {
     pub fn aggregate(signatures: &[Self]) -> Result<Self, SignatureError> {
         let aggregated_signature =
             signatures
-                .into_iter()
+                .iter()
                 .fold(Self::default(), |acc, s| Signature {
                     signature_proof: SignatureProof {
-                        pi_2_g1: acc.signature_proof.pi_2_g1 + s.signature_proof.pi_2_g1.clone(),
-                        pi_4_g1: acc.signature_proof.pi_4_g1 + s.signature_proof.pi_4_g1.clone(),
+                        pi_2_g1: acc.signature_proof.pi_2_g1 + s.signature_proof.pi_2_g1,
+                        pi_4_g1: acc.signature_proof.pi_4_g1 + s.signature_proof.pi_4_g1,
                     },
                 });
         Ok(aggregated_signature)

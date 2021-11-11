@@ -42,7 +42,7 @@ impl<E: PairingEngine> ProvenPublicKey<E> {
         };
         let aggregated_public_key =
             public_keys
-                .into_iter()
+                .iter()
                 .try_fold(zero_proven_public_key, |acc, pk| {
                     if acc.public_key.srs != pk.public_key.srs {
                         return Err(SignatureError::SRSDifferent);
@@ -50,13 +50,13 @@ impl<E: PairingEngine> ProvenPublicKey<E> {
                     Ok(ProvenPublicKey {
                         public_key: PublicKey {
                             srs: acc.public_key.srs,
-                            pk: acc.public_key.pk + pk.public_key.pk.clone(),
+                            pk: acc.public_key.pk + pk.public_key.pk,
                         },
                         key_proof: KeyProof {
-                            pi_1_g2: acc.key_proof.pi_1_g2 + pk.key_proof.pi_1_g2.clone(),
-                            pi_2_g2: acc.key_proof.pi_2_g2 + pk.key_proof.pi_2_g2.clone(),
-                            pi_1_g1: acc.key_proof.pi_1_g1 + pk.key_proof.pi_1_g1.clone(),
-                            pi_3_g1: acc.key_proof.pi_3_g1 + pk.key_proof.pi_3_g1.clone(),
+                            pi_1_g2: acc.key_proof.pi_1_g2 + pk.key_proof.pi_1_g2,
+                            pi_2_g2: acc.key_proof.pi_2_g2 + pk.key_proof.pi_2_g2,
+                            pi_1_g1: acc.key_proof.pi_1_g1 + pk.key_proof.pi_1_g1,
+                            pi_3_g1: acc.key_proof.pi_3_g1 + pk.key_proof.pi_3_g1,
                         },
                     })
                 })?;

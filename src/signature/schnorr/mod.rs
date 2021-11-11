@@ -278,8 +278,8 @@ mod test {
         let message = b"hello";
         let signature = schnorr.sign(rng, &keypair.0, &message[..]).unwrap();
 
-        check_serialization(srs.clone());
-        check_serialization(keypair.clone());
-        check_serialization(signature.clone());
+        check_serialization(srs);
+        check_serialization(keypair);
+        check_serialization(signature);
     }
 }

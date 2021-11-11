@@ -92,7 +92,7 @@ mod test {
             .unwrap();
 
         let aggregated_pk =
-            ProvenPublicKey::aggregate(&[proven_public_key1, proven_public_key2], srs.clone())
+            ProvenPublicKey::aggregate(&[proven_public_key1, proven_public_key2], srs)
                 .unwrap();
         let aggregated_sig = Signature::aggregate(&[signature1, signature2]).unwrap();
 
@@ -107,7 +107,7 @@ mod test {
         let rng = &mut thread_rng();
         let srs = SRS::<Bls12_381>::setup(rng).unwrap();
         let keypair1 = Keypair::generate_keypair(rng, srs.clone()).unwrap();
-        let keypair2 = Keypair::generate_keypair(rng, srs.clone()).unwrap();
+        let keypair2 = Keypair::generate_keypair(rng, srs).unwrap();
         let message = b"hello";
 
         let proven_public_key1 = keypair1.prove_key().unwrap();
@@ -123,7 +123,7 @@ mod test {
 
         let signature2 = keypair2.sign(&message[..]).unwrap();
         signature2
-            .verify_and_derive(proven_public_key2.clone(), &message[..])
+            .verify_and_derive(proven_public_key2, &message[..])
             .unwrap();
 
         let aggregated_sig = Signature::aggregate(&[signature1, signature2]).unwrap();
@@ -158,7 +158,7 @@ mod test {
             .unwrap();
 
         let aggregated_pk =
-            ProvenPublicKey::aggregate(&[proven_public_key1, proven_public_key2], srs.clone())
+            ProvenPublicKey::aggregate(&[proven_public_key1, proven_public_key2], srs)
                 .unwrap();
         let aggregated_sig = Signature::aggregate(&[signature1, signature2]).unwrap();
 
@@ -278,8 +278,8 @@ mod test {
         let message = b"hello";
         let signature = keypair.sign(&message[..]).unwrap();
 
-        check_serialization(srs.clone());
-        check_serialization(keypair.clone());
-        check_serialization(signature.clone());
+        check_serialization(srs);
+        check_serialization(keypair);
+        check_serialization(signature);
     }
 }

@@ -28,7 +28,7 @@ pub struct Keypair<E: PairingEngine> {
 impl<E: PairingEngine> Keypair<E> {
     pub fn generate_keypair<R: Rng>(rng: &mut R, srs: SRS<E>) -> Result<Self, SignatureError> {
         let a = E::Fr::rand(rng);
-        let a_g2 = srs.g_1_g2.mul(a.clone());
+        let a_g2 = srs.g_1_g2.mul(a);
         let private_key = PrivateKey {
             sk: a_g2.into_affine(),
         };
@@ -40,7 +40,7 @@ impl<E: PairingEngine> Keypair<E> {
         let keypair = Keypair {
             alpha: E::Fr::rand(rng),
             beta: E::Fr::rand(rng),
-            srs: srs.clone(),
+            srs,
             private: private_key,
             public: public_key,
         };
@@ -72,8 +72,8 @@ impl<E: PairingEngine> Keypair<E> {
         let pi_2_g2 = self.srs.g_3_g2.mul(self.alpha.neg())
             + &self.srs.g_4_g2.mul(self.beta.neg())
             + &self.private.sk.into_projective();
-        let pi_1_g1 = self.srs.h_g1.mul(self.alpha.clone());
-        let pi_3_g1 = self.srs.h_g1.mul(self.beta.clone());
+        let pi_1_g1 = self.srs.h_g1.mul(self.alpha);
+        let pi_3_g1 = self.srs.h_g1.mul(self.beta);
 
         let key_proof = KeyProof {
             pi_1_g2: pi_1_g2.into_affine(),

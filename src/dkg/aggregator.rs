@@ -191,12 +191,10 @@ impl<
             batched_all.extend_from_slice(&batched_g_1_neg);
             let batched_all = E::G1Projective::batch_normalization_into_affine(&batched_all);
             let batched_a_i = batched_all[..batched_a_i.len()]
-                .into_iter()
-                .map(|x| x.clone())
+                .iter().copied()
                 .collect::<Vec<_>>();
             let batched_g_1_neg = batched_all[batched_a_i.len()..]
-                .into_iter()
-                .map(|x| x.clone())
+                .iter().copied()
                 .collect::<Vec<_>>();
             (batched_a_i, batched_g_1_neg)
         };

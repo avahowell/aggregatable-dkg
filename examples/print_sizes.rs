@@ -60,7 +60,7 @@ fn print_aggregatable_dkg_sizes() {
 fn print_bls_signature_sizes() {
     let rng = &mut thread_rng();
     let srs = BLSSRS::<BLSSignatureG1<Bls12_381>>::setup(rng).unwrap();
-    let bls = BLSSignature { srs: srs.clone() };
+    let bls = BLSSignature { srs: srs };
     let keypair = bls.generate_keypair(rng).unwrap();
     let message = b"hello";
     let signature = bls.sign(rng, &keypair.0, &message[..]).unwrap();
@@ -89,7 +89,7 @@ fn print_transcript_size<
 
     let u_1 = G2Projective::rand(rng).into_affine();
     let dkg_config = Config {
-        srs: srs.clone(),
+        srs: srs,
         u_1,
         degree,
     };
@@ -129,7 +129,7 @@ fn print_transcript_size<
             .sign(
                 rng,
                 &pok_keypair.0,
-                &message_from_c_i::<Bls12_381>(c.clone()).unwrap(),
+                &message_from_c_i::<Bls12_381>(c).unwrap(),
             )
             .unwrap();
 
@@ -138,12 +138,12 @@ fn print_transcript_size<
             .sign(
                 rng,
                 &signature_keypair.0,
-                &message_from_c_i::<Bls12_381>(c.clone()).unwrap(),
+                &message_from_c_i::<Bls12_381>(c).unwrap(),
             )
             .unwrap();
 
         let transcript_participant = DKGTranscriptParticipant::<Bls12_381, SPOK, SSIG> {
-            c_i: c.clone(),
+            c_i: c,
             weight: 1,
             c_i_pok: pok,
             signature_on_c_i: signature,
@@ -221,7 +221,7 @@ fn main() {
     print_transcript_size(64, "bls", srs.clone(), bls_pok.clone(), bls_sig.clone());
     print_transcript_size(128, "bls ", srs.clone(), bls_pok.clone(), bls_sig.clone());
     print_transcript_size(256, "bls ", srs.clone(), bls_pok.clone(), bls_sig.clone());
-    print_transcript_size(8192, "bls ", srs.clone(), bls_pok.clone(), bls_sig.clone());
+    print_transcript_size(8192, "bls ", srs.clone(), bls_pok, bls_sig);
 
     let schnorr_sig = SchnorrSignature::<G2Affine> {
         srs: SchnorrSRS {
@@ -257,8 +257,8 @@ fn main() {
     print_transcript_size(
         8192,
         "schnorr",
-        srs.clone(),
-        schnorr_pok.clone(),
-        schnorr_sig.clone(),
+        srs,
+        schnorr_pok,
+        schnorr_sig,
     );
 }

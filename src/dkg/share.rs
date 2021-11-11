@@ -74,7 +74,11 @@ impl<
                 other.num_participants,
             ));
         }
-        let contributions = (0..self.num_participants)
+        
+        let aggregated = Self {
+            degree: self.degree,
+            num_participants: self.num_participants,
+            contributions: (0..self.num_participants)
             .map(
                 |i| match (self.contributions.get(&i), other.contributions.get(&i)) {
                     (Some(a), Some(b)) => {
@@ -96,12 +100,7 @@ impl<
             )
             .collect::<Result<Vec<_>, _>>()?
             .into_iter()
-            .filter_map(|e| e)
-            .collect::<Vec<_>>();
-        let aggregated = Self {
-            degree: self.degree,
-            num_participants: self.num_participants,
-            contributions: contributions.into_iter().collect(),
+            .flatten().collect(),
             pvss_share: self.pvss_share.aggregate(&other.pvss_share),
         };
         Ok(aggregated)

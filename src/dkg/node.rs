@@ -282,7 +282,7 @@ mod test {
 
         let u_1 = G2Projective::rand(rng).into_affine();
         let dkg_config = Config {
-            srs: srs.clone(),
+            srs: srs,
             u_1,
             degree: 10,
         };
@@ -293,10 +293,10 @@ mod test {
 
         let mut node = Node {
             aggregator: DKGAggregator {
-                config: dkg_config.clone(),
-                scheme_pok: bls_pok.clone(),
+                config: dkg_config,
+                scheme_pok: bls_pok,
                 scheme_sig: bls_sig.clone(),
-                participants: participants.clone().into_iter().enumerate().collect(),
+                participants: participants.into_iter().enumerate().collect(),
                 transcript: DKGTranscript::empty(degree, num_participants),
             },
             dealer,
@@ -326,7 +326,7 @@ mod test {
 
         let u_1 = G2Projective::rand(rng).into_affine();
         let dkg_config = Config {
-            srs: srs.clone(),
+            srs: srs,
             u_1,
             degree: 2,
         };
@@ -429,7 +429,7 @@ mod test {
 
         let u_1 = G2Projective::rand(rng).into_affine();
         let dkg_config = Config {
-            srs: srs.clone(),
+            srs: srs,
             u_1,
             degree: 2,
         };
